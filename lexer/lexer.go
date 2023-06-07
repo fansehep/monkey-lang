@@ -37,7 +37,7 @@ func newToken(ty token.TokenType, ch byte) token.Token {
 }
 
 func (l *Lexer) skipWhiteSpace() {
-	if l.currentReadChar == ' ' ||
+	for l.currentReadChar == ' ' ||
 		l.currentReadChar == '\t' ||
 		l.currentReadChar == '\n' ||
 		l.currentReadChar == '\r' {
@@ -50,17 +50,49 @@ func (l *Lexer) NextToken() token.Token {
 	l.skipWhiteSpace()
 	switch l.currentReadChar {
 	case '=':
-		tok = newToken(token.ASSIGN, l.currentReadChar)
+		if l.peekChar() == '=' {
+			ch := l.currentReadChar
+			l.readChar()
+			literal := string(ch) + string(l.currentReadChar)
+			tok = token.Token{
+				Type:    token.EQ,
+				Literal: literal,
+			}
+		} else {
+			tok = newToken(token.ASSIGN, l.currentReadChar)
+		}
+	case '+':
+		tok = newToken(token.PLUS, l.currentReadChar)
+	case '-':
+		tok = newToken(token.MINUS, l.currentReadChar)
+	case '!':
+		if l.peekChar() == '=' {
+			ch := l.currentReadChar
+			l.readChar()
+			literal := string(ch) + string(l.currentReadChar)
+			tok = token.Token{
+				Type:    token.NOT_EQ,
+				Literal: literal,
+			}
+		} else {
+			tok = newToken(token.BANG, l.currentReadChar)
+		}
+	case '/':
+		tok = newToken(token.SLASH, l.currentReadChar)
+	case '*':
+		tok = newToken(token.ASTERISK, l.currentReadChar)
+	case '<':
+		tok = newToken(token.LESS_THAN, l.currentReadChar)
+	case '>':
+		tok = newToken(token.GREATER_THAN, l.currentReadChar)
 	case ';':
 		tok = newToken(token.SEMICOLON, l.currentReadChar)
+	case ',':
+		tok = newToken(token.COMMA, l.currentReadChar)
 	case '(':
 		tok = newToken(token.LPAREN, l.currentReadChar)
 	case ')':
 		tok = newToken(token.RPAREN, l.currentReadChar)
-	case ',':
-		tok = newToken(token.COMMA, l.currentReadChar)
-	case '+':
-		tok = newToken(token.PLUS, l.currentReadChar)
 	case '{':
 		tok = newToken(token.LBRACE, l.currentReadChar)
 	case '}':
@@ -111,4 +143,12 @@ func (l *Lexer) readNumber() string {
 
 func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
+}
+
+func (l *Lexer) peekChar() byte {
+	if l.readPosition >= len(l.input) {
+		return 0
+	} else {
+		return l.input[l.readPosition]
+	}
 }
