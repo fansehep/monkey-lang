@@ -14,15 +14,8 @@ let add = fn(x, y) {
   x + y;
 };
 let result = add(five, ten);
-!-/*5;
-5 < 10 > 5;
-if (5 < 10) {
-  return true;
-} else {
-  return false;
-}
-10 == 10;
-10 != 9;    
+"foobar"
+"foo bar"
 `
 
 	tests := []struct {
@@ -65,6 +58,8 @@ if (5 < 10) {
 		{token.IDENT, "ten"},
 		{token.RPAREN, ")"},
 		{token.SEMICOLON, ";"},
+        {token.STRING, "foobar"},
+        {token.STRING, "foo bar"},
 		{token.EOF, ""},
 	}
 	l := New(input)
