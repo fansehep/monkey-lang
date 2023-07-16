@@ -6,6 +6,7 @@ import (
 	"github.com/fansehep/monkey-lang/executor"
 	"github.com/fansehep/monkey-lang/lexer"
 	"github.com/fansehep/monkey-lang/parser"
+    "github.com/fansehep/monkey-lang/object"
 	"io"
 )
 
@@ -41,13 +42,14 @@ func Start(in io.Reader, out io.Writer) {
 		l := lexer.New(line)
 		p := parser.New(l)
 		program := p.ParseProgram()
+        env := object.NewEnvironment()
 		if len(p.Errors()) != 0 {
 			printParserErrors(out, p.Errors())
 			continue
 		}
-		evaluated := executor.Eval(program)
+		evaluated := executor.Eval(program, env)
 		if evaluated != nil {
-			io.WriteString(out, program.String())
+			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")
 		}
 	}
